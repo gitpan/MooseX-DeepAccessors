@@ -1,7 +1,7 @@
 package MooseX::DeepAccessors;
 use Moose;
 use Scalar::Util qw(blessed);
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 extends 'Moose::Meta::Attribute';
 
 has deep_accessors => ( is => 'ro', isa => 'HashRef', default => sub { {} } );
@@ -36,48 +36,9 @@ package Moose::Meta::Attribute::Custom::MyDeepAccessors;
 sub register_implementation {
     'MooseX::DeepAccessors'
 }
-1;
-
-unless (caller) {
-    package Foo;
-    use Moose;
-    has 'blah' => (
-        isa => 'Str',
-        is => 'rw',
-        required => 0,
-    );
-
-    package MyClass;
-
-    use Moose;
-    use MooseX::DeepAccessors;
-
-    has foo => (
-        isa => 'Str',
-        is => 'ro',
-        required => 0,
-    );
-
-    has delegate => (
-        isa => 'Foo',
-        metaclass => 'MooseX::DeepAccessors',
-        is => 'ro',
-        default => sub { Foo->new },
-        required => 0,
-        lazy => 1,
-        deep_accessors => {
-            'bar' => { 'blah' => [ sub { $_[0]->foo }, ], },
-        },
-    );
-
-    package Another;
-    my $myobj = MyClass->new( foo => "foobarbaz" );
-    $myobj->bar; # equiv. to $myobj->delegate->blah( $myobj->foo );
-
-    1;
-};
 
 1;
+
 
 __END__
 =head1 NAME
@@ -86,7 +47,7 @@ MooseX::DeepAccessors - Delegate methods to member objects, curried with more me
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
